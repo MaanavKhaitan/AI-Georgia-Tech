@@ -9,7 +9,7 @@ def ask_user_letter(guesses_list):
 	user_letter = raw_input('Please enter a letter: ')
 	if len(user_letter) != 1 or type(user_letter) != str:
 		print 'Guess must be one letter long.'
-		ask_user_letter(guesses_list)
+		user_letter = ask_user_letter(guesses_list)
 	if user_letter in guesses_list:
 		print 'You already typed the letter %s!' % (user_letter)
 		user_letter = ask_user_letter(guesses_list)
