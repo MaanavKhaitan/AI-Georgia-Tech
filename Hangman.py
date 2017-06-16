@@ -1,6 +1,8 @@
 import numpy as np
 
 word_list = ['orange', 'lambda', 'gentleman', 'lanyard', 'jelly', 'xylophone', 'waffle']
+user_guesses = []
+second_player = False
 
 def ask_user_letter():
 #Asks user for and returns a letter guess
@@ -8,6 +10,9 @@ def ask_user_letter():
 	if len(user_letter) != 1 or type(user_letter) != str:
 		print 'Guess must be one letter long.'
 		ask_user_letter()
+	if user_letter in user_guesses:
+		print 'You already typed the letter %s!' % (user_letter)
+		user_letter = ask_user_letter()
 	return user_letter
 
 def print_initial_progress(word):
@@ -49,6 +54,8 @@ def play_hangman():
 		print_hangman(wrong_guess_count)
 		print user_progress
 		user_guess = ask_user_letter()
+		if user_guess not in user_guesses:
+			user_guesses.append(user_guess)		
 		if user_guess in word:
 			user_progress = print_progress(user_guess, find_indices(word,user_guess), user_progress)
 			complete_guess += user_guess*len(find_indices(word,user_guess))
