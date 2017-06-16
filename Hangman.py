@@ -4,16 +4,16 @@ word_list = ['orange', 'lambda', 'gentleman', 'lanyard', 'jelly', 'xylophone', '
 user_guesses = []
 second_player = False
 
-def ask_user_letter():
+def ask_user_letter(guesses_list):
 #Asks user for and returns a letter guess
 	user_letter = raw_input('Please enter a letter: ')
 	if len(user_letter) != 1 or type(user_letter) != str:
 		print 'Guess must be one letter long.'
-		ask_user_letter()
-	if user_letter in user_guesses:
+		ask_user_letter(guesses_list)
+	if user_letter in guesses_list:
 		print 'You already typed the letter %s!' % (user_letter)
-		user_letter = ask_user_letter()
-	return user_letter
+		user_letter = ask_user_letter(guesses_list)
+	return user_letter.lower()
 
 def print_initial_progress(word):
 #Prints initial dashes based on length of word
@@ -42,18 +42,29 @@ def find_indices(word, letter):
 #Returns all indices in word where letter appears
     return [i for i, ltr in enumerate(word) if ltr == letter]
 
+def ask_second_player_for_word():
+	second_player_word = raw_input('Player 1, please provide a word for player 2 to guess: ')
+	return second_player_word.lower()
 
 def play_hangman():
 #Main function that makes user play the entire game of Hangman
 	print 'Welcome to the wonderful game of Hangman!'
 	wrong_guess_count = 0
-	word = np.random.choice(word_list)
+	second_player = raw_input('How many players are playing today? (1/2)')
+	if second_player=='2':
+		word = ask_second_player_for_word()
+		for i in range(0,40):
+			print " \n"
+		print 'Now please hand the device to Player 2 and enjoy the game: '
+	else:
+		word = np.random.choice(word_list).lower()
+	user_guesses = []
 	user_progress = print_initial_progress(word)
 	complete_guess = ''
 	for i in range(0,50):
 		print_hangman(wrong_guess_count)
 		print user_progress
-		user_guess = ask_user_letter()
+		user_guess = ask_user_letter(user_guesses)
 		if user_guess not in user_guesses:
 			user_guesses.append(user_guess)		
 		if user_guess in word:
