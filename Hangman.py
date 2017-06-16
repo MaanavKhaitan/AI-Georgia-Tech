@@ -1,11 +1,11 @@
 import numpy as np
 
-word_list = ['maanav', 'meele', 'lambda']
+word_list = ['orange', 'lambda', 'gentleman', 'lanyard', 'jelly', 'xylophone', 'waffle']
 
 def ask_user_letter():
 #Asks user for and returns a letter guess
 	user_letter = raw_input('Please enter a letter: ')
-	if len(user_letter) != 1:
+	if len(user_letter) != 1 or type(user_letter) != str:
 		print 'Guess must be one letter long.'
 		ask_user_letter()
 	return user_letter
@@ -30,6 +30,7 @@ def print_progress(letter, indices, progress):
 	else:
 		later_index = ((indices+1)*2-2)
 		final_progress += progress[0:((indices+1)*2-2)] + letter + progress[later_index+1:]
+	final_progress = final_progress
 	return final_progress 
 
 def find_indices(word, letter):
@@ -51,15 +52,30 @@ def play_hangman():
 		if user_guess in word:
 			user_progress = print_progress(user_guess, find_indices(word,user_guess), user_progress)
 			complete_guess += user_guess*len(find_indices(word,user_guess))
-			if len(complete_guess) == len(word) and sorted(complete_guess) == sorted(word):
+			if len(''.join(set(complete_guess))) == len(''.join(set(word))) and sorted(''.join(set(complete_guess))) == sorted(''.join(set(word))):
+				print_hangman(wrong_guess_count)
+				print user_progress
 				print 'Congratulations! The word was %s!' % (word)
+				user_again_choice = raw_input('Would you like to play again? (y/n)')
+				if user_again_choice=='y':
+					print 'We\'re glad to hear that!'
+					play_hangman()
+				elif user_again_choice=='n':
+					print 'Well we hope you enjoyed your game of Hangman today!'
 				break
 		else:
 			wrong_guess_count += 1
 			print '%s is not in the word.'%(user_guess)
 		if wrong_guess_count==6:
 			print_hangman(wrong_guess_count)
+			print user_progress
 			print 'Sorry, game over! The word was %s.'%(word)
+			user_again_choice = raw_input('Would you like to play and try your luck again? (y/n)')
+			if user_again_choice=='y':
+				print 'We\'re glad to hear that!'
+				play_hangman()
+			elif user_again_choice=='n':
+				print 'Well we hope you enjoyed your game of Hangman today!'
 			break
 
 
@@ -125,4 +141,3 @@ def print_hangman(wrong_count):
 
 
 play_hangman()
-
