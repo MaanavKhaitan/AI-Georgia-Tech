@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 
 # Read data into a dataframe
 df = pd.read_csv('/Users/maanavkhaitan/Downloads/Nerf Projectile Data.csv', usecols=['Angle', 'Average Distance'])
@@ -75,7 +76,37 @@ def ask_user():
 		ask_user()
 
 # Initialize ask_user function when program starts
-ask_user()
+#ask_user()
+
+# Calculate Training Error
+temp_rmse = []
+predictions = np.polyval(parameters, [-40,-20,0,20,40,60,80])
+correct_data = [61,177.33,196.33,680.33,651,534.67,24.67]
+for i in range(0,len(predictions)):
+	temp_rmse.append((predictions[i]-correct_data[i])**2)
+print 'Training Data: ' + str(((sum(temp_rmse))/7)**0.5)
+
+#Calculate Testing Error
+temp_test = []
+predictions_test = np.polyval(parameters, [-30, -10, 10, 30, 50, 70, 90])
+correct_test = [116,246,539.67,733.67,652,303.67,0]
+for i in range(0,len(predictions_test)):
+	temp_test.append((predictions_test[i]-correct_test[i])**2)
+print 'Testing Data: ' + str(((sum(temp_test))/7)**0.5)
+
+plt.plot(angles, y_data, label='Fit')
+plt.scatter(df['Angle'], df['Average Distance'], label='Training Data', color='r')
+#plt.scatter(user_angles, user_distances, label='Your angles', color='g')
+plt.scatter([-30, -10, 10, 30, 50, 70, 90], [116,246,539.67,733.67,652,303.67,0], label='Test Data', color='r')
+plt.scatter([-30, -10, 10, 30, 50, 70, 90], predictions_test, label='Test Predictions', color='g')
+plt.scatter([-40,-20,0,20,40,60,80], predictions, label='Training Predictions', color='g')
+plt.title('Polynomial Regression: Angle vs Distance')
+plt.xlabel('Angle')
+plt.ylabel('Distance')
+plt.legend(loc='lower left')
+plt.show()
+
+
 
 
 
