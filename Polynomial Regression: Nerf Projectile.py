@@ -1,9 +1,5 @@
 import pandas as pd
 import numpy as np
-from sklearn import tree
-from sklearn.model_selection import cross_val_score
-from sklearn.ensemble import RandomForestRegressor
-import scipy.optimize as spo
 import matplotlib.pyplot as plt
 
 # Read data into a dataframe
@@ -41,8 +37,9 @@ def ask_user():
 	user_angle = raw_input('Please enter an angle:')
 
 	# If user angle is a number
-	if user_angle.isdigit():
+	try:
 
+		user_angle = float(user_angle)
 		# Append user angle to list of user angles
 		user_angles.append(user_angle)
 
@@ -51,7 +48,7 @@ def ask_user():
 		print np.poly1d(parameters)
 
 		# Calculate distance corresponding to user angle
-		dist = np.polyval(parameters, int(user_angle))
+		dist = np.polyval(parameters, user_angle)
 
 		# Append this distance to list of user distances
 		user_distances.append(dist)
@@ -73,9 +70,13 @@ def ask_user():
 			plot_data()
 
 	# If user angle is not a number		
-	else:
+	except ValueError:
 		print 'Invalid Angle.'
 		ask_user()
 
 # Initialize ask_user function when program starts
 ask_user()
+
+
+
+
