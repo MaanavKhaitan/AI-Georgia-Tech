@@ -7,25 +7,35 @@ import numpy as np
 def findSimilar(iLike, userLikes):
     # Create an And similarity
     similarityAnd = len([i for i, item in enumerate(userLikes) if item==1 and iLike[i]==1]) # replace 0 with the correct code
-    print similarityAnd
+
     # Create a per user sum
     similaritySum = 0 # replace 0 with the correct code
 
     # Create an Or similarity
     userSimilarityOr = len([i for i, item in enumerate(userLikes) if iLike[i]==1 or item==1]) # replace 0 with the correct code
-    print userSimilarityOr
 
     # Calculate the similarity
-    userSimilarity = similarityAnd/float(userSimilarityOr) # replace 0 with the correct code to calculate the Jaccard Index for each user
-    print userSimilarity
+    userSimilarity = []
+    for user in range(0,len(userLikes)):
+        similarityAnd = len([i for i, item in enumerate(userLikes[user]) if item==1 and iLike[i]==1])
+        userSimilarityOr = len([i for i, item in enumerate(userLikes[user]) if iLike[i]==1 or item==1])
+        userSimilarity.append(similarityAnd/float(userSimilarityOr))# replace 0 with the correct code to calculate the Jaccard Index for each user
     
-    # Make the most similar user has a new like that the previous user did not have
+    # Make sure the most similar user has a new like that the previous user did not have
     # I used a while loop.
     # You can "get rid" of a user that is most similar, but doesn't have any new likes
     # by setting the userSimilarity for them to 0
     # When you get the index, save it in the variable maxIndex
+
+    while True:
+        maxIndex = userSimilarity.index(max(userSimilarity))
+        if userLikes[maxIndex] == iLike:
+            userSimilarity[maxIndex] = 0
+        else:
+            break
     
-    # Print the max similarity number (most times this is something like 0.17
+    # Print the max similarity number (most times this is something like 0.17)
+    print max(userSimilarity)
     
     # Return the index of the user which is the best match
     return maxIndex
@@ -33,7 +43,7 @@ def findSimilar(iLike, userLikes):
 def printMovie(id):
     # Print the id of the movie and the name.  This should look something like
     # "    - 430: Duck Soup (1933)" if the id is 430 and the name is Duck Soup (1933)
-    print(0) # replace 0 with the correct code
+    print '- %s: %s' % (id, movieNames[id-1][1]) # replace 0 with the correct code
 
 def processLikes(iLike):
     print("\n\nSince you like:")
@@ -41,18 +51,31 @@ def processLikes(iLike):
     # Print the name of each movie the user reported liking
     # Hint: Use a for loop and the printMovie function.
 
+    for i in iLike:
+        printMovie(i)
+
     # Convert iLike into an array of 0's and 1's which matches the array for other users
     # It should have one column for each movie (just like the userLikes array)
     # Start with all zeros, then fill in a 1 for each movie the user likes
-    iLikeNp = 0 # replace 0 with the code to make the array of zeros
+    iLikeNp = np.zeros((1, maxMovie)) # replace 0 with the code to make the array of zeros
+    iLikeNp = iLikeNp.flatten()
     # You'll need a few more lines of code to fill in the 1's as needed
 
+    iLike[:] = [x - 1 for x in iLike]
+    iLikeNp[iLike] = 1
+    print iLikeNp
+
+
     # Find the most similar user
-    user = 0 # replace 0 with the correct code (hint: use one of your functions)
+    user = findSimilar(iLikeNp, userLikes) # replace 0 with the correct code (hint: use one of your functions)
     print("\nYou might like: ")
+
     # Find the indexes of the values that are ones
     # https://stackoverflow.com/a/17568803/3854385 (Note: You don't want it to be a list, but you do want to flatten it.)
-    recLikes = 0 # replace 0 with the needed code
+    recLikes = np.argwhere(userLikes[maxIndex] == np.amax(userLikes[maxIndex])) # replace 0 with the needed code
+    recLikes = recLikes.flatten()
+
+    print recLikes
 
     # For each item the similar user likes that the person didn't already say they liked
     # print the movie name using printMovie (you'll also need a for loop and an if statement)
@@ -162,7 +185,6 @@ for i in range(0,movieData.shape[0]):
     if movieData[i][2] == 4 or movieData[i][2] == 5:
         userLikes[movieData[i][0],movieData[i][1]] = 1
 
-print userLikes
 
 
 ########################################################
@@ -193,8 +215,4 @@ processLikes(iLike)
 # You can just assume they have a list of movies somewhere so they already know what numbers to type in.
 # If you'd like to give them options though, that would be a cool bonus project if you finish early.
 
-
-
-
-
-
+        
