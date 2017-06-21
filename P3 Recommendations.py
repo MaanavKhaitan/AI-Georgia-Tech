@@ -1,4 +1,3 @@
-from __future__ import print_function
 import numpy as np
 
 ########################################################
@@ -7,14 +6,18 @@ import numpy as np
 
 def findSimilar(iLike, userLikes):
     # Create an And similarity
-    similarityAnd = 0 # replace 0 with the correct code
+    similarityAnd = len([i for i, item in enumerate(userLikes) if item==1 and iLike[i]==1]) # replace 0 with the correct code
+    print similarityAnd
     # Create a per user sum
     similaritySum = 0 # replace 0 with the correct code
+
     # Create an Or similarity
-    userSimilarityOr = 0 # replace 0 with the correct code
-    
+    userSimilarityOr = len([i for i, item in enumerate(userLikes) if iLike[i]==1 or item==1]) # replace 0 with the correct code
+    print userSimilarityOr
+
     # Calculate the similarity
-    userSimilarity = 0 # replace 0 with the correct code to calculate the Jaccard Index for each user
+    userSimilarity = similarityAnd/float(userSimilarityOr) # replace 0 with the correct code to calculate the Jaccard Index for each user
+    print userSimilarity
     
     # Make the most similar user has a new like that the previous user did not have
     # I used a while loop.
@@ -60,17 +63,21 @@ def processLikes(iLike):
 
 # Load Data
 # Load the movie names data (u.item) with just columns 0 and 1 (id and name) id is np.int, name is S128
-movieNames = 0 # replace 0 with the correct code to load the movie names
-    
+movieNames = np.loadtxt('/Users/maanavkhaitan/Downloads/baseCode/ml-100k/u.item', dtype = {'names':('id','name'), 'formats': (np.int, 'S128')}, delimiter = '|', usecols = (0,1)) # replace 0 with the correct code to load the movie names
+
 # Create a dictionary with the ids as keys and the names as the values
-movieDict = 0 # replace 0 with the code to make the dict
+#movieDict = dict(enumerate(movieNames[:,1])) # replace 0 with the code to make the dict
+movieDict = {}
+for i in range(1,1683):
+    movieDict[i] = movieNames[i-1][1]
+
 # Load the movie Data (u.data) with just columns 0, 1, and 2 (user, movie, rating) all are np.int
-movieData = 0 # replace 0 with the correct cod eto load the movie data
+movieData = np.loadtxt('/Users/maanavkhaitan/Downloads/baseCode/ml-100k/u.data', dtype={'names':('user','movie','rating'), 'formats': (np.int, np.int, np.int)}, usecols=(0,1,2)) # replace 0 with the correct cod eto load the movie data
 
-print(movieData)
-print(movieNames)
+#print(movieData)
+#print(movieNames)
 
-exit(0) # Delete this after we finish phase 1, for now just get the data loaded
+#exit(0) # Delete this after we finish phase 1, for now just get the data loaded
 
 ########################################################
 # Begin Phase 2
@@ -80,17 +87,26 @@ exit(0) # Delete this after we finish phase 1, for now just get the data loaded
 # This is non-ideal, pandas, scipy, or graphlib should be used here
 
 # Create a dictionary to hold our temporary ratings
-movieRatingTemp = 0 # replace 0 with code for an empty dictionary
+movieRatingTemp = {} # replace 0 with code for an empty dictionary
 
 # For every row in the movie data, add the rating to a list in the dictionary entry
 # for that movies ID (don't forget to initialize the dictionary entry)
+entry = {}
+for i in range(0,movieData.shape[0]):
+    entry[movieData[i][1]] = []
+for i in range(0,movieData.shape[0]):
+    entry[movieData[i][1]].append(movieData[i][2])
 
 # Create an empty dictionary for movieRating and movieRatingCount
-movieRating = 0 # replace 0 with code for an empty dictionary
-movieRatingCount = 0 # replace 0 with code for an empty dictionary
+movieRating = {} # replace 0 with code for an empty dictionary
+movieRatingCount = {} # replace 0 with code for an empty dictionary
 
 # Using numpy place the average rating for each movie in movieRating and the total number of ratings in movieRatingCount
 # Note: You will need a for loop to get each dictionary key
+
+for key in entry.keys():
+    movieRating[key] = np.mean(entry[key])
+    movieRatingCount[key] = len(entry[key])
 
 
 # Get sorting ratings
@@ -102,6 +118,8 @@ print("Top Ten Movies:")
 # Print the top 10 movies
 # It should print the number, title, id, rating and count of reviews for each movie
 # ie 2. Someone Else's America (1995) (ID: 1599) Rating: 5.0 Count: 1
+for i in range(1, 11):
+    print '%s. %s (ID: %s) Rating: %s Count: %s' % (str(i), movieNames[(movieRatingS[i-1][0])-1][1], movieRatingS[i-1][0], movieRatingS[i-1][1], movieRatingCount[movieRatingS[i-1][0]])
 
 
 # Top 10 Movies with at least 100 ratings    
@@ -111,7 +129,13 @@ print("\n\nTop Ten movies with at least 100 ratings:")
 # ie (16. Close Shave, A (1995) (ID: 408) Rating: 4.49 Count: 112)
 # Number 16 is first in this list because it's the first movie with over 100 ratings
 
-exit(0) # Remove this line after we finish phase 2
+hundred_movies = [movieRating.items()[i-1] for i in range(1,1683) if movieRatingCount[i]>=100]
+hundred_movieRatingS = sorted(hundred_movies, key=lambda (k,v): (v,k), reverse=True)
+for i in range(1,11):
+    print '%s. %s (ID: %s) Rating: %s Count: %s' % (movieRatingS.index(hundred_movieRatingS[i-1])+1, movieNames[(hundred_movieRatingS[i-1][0])-1][1], hundred_movieRatingS[i-1][0], hundred_movieRatingS[i-1][1], movieRatingCount[hundred_movieRatingS[i-1][0]])
+
+
+#exit(0) # Remove this line after we finish phase 2
 
 ########################################################
 # Begin Phase 3
@@ -122,10 +146,10 @@ exit(0) # Remove this line after we finish phase 2
 # Create a numpy ndarray of zeros with demensions of max user id + 1 and max movie + 1 (because we'll use them as 1 indexed not zero indexed)
 
 # Find the max movie ID + 1
-maxMovie = 0 # replace 0 with the correct code
+maxMovie = movieNames.shape[0] + 1 # replace 0 with the correct code
 
 # Find the max user Id + 1
-maxUser = 0 # replace 0 with the correct code
+maxUser = movieData['user'].max() + 1# replace 0 with the correct code
 
 # Create an array of 0s which will fill in with 1s when a user likes a movie
 userLikes = np.zeros((maxUser, maxMovie))
@@ -133,6 +157,12 @@ userLikes = np.zeros((maxUser, maxMovie))
 # Go through all the rows of the movie data.
 # If the user rated a movie as 4 or 5 set userLikes to 1 for that user and movie
 # Note: You'll need a for loop and an if statement
+
+for i in range(0,movieData.shape[0]):
+    if movieData[i][2] == 4 or movieData[i][2] == 5:
+        userLikes[movieData[i][0],movieData[i][1]] = 1
+
+print userLikes
 
 
 ########################################################
@@ -162,5 +192,12 @@ processLikes(iLike)
 # Note: I recommend having them select movies by ID since the titles are really long.
 # You can just assume they have a list of movies somewhere so they already know what numbers to type in.
 # If you'd like to give them options though, that would be a cool bonus project if you finish early.
+
+
+
+
+
+
+
 
         
