@@ -214,17 +214,34 @@ processLikes(iLike)
 user_movie_ids = []
 
 
+def take_user_input(input_title, print_out):
+    out = [i for i, v in enumerate(movieNames) if input_title.lower() in v[1].lower()]
+    if print_out == True:
+        print 'Movies that match your search:'
+        for item in out:
+            printMovie(item+1)
+    if len(out) > 0:
+        return True
+
+
 def ask_user():
     while True: 
-        user_movie_id = raw_input('Please enter an ID for a movie you like or type "done" if you\'re done: ')
-        if user_movie_id == 'done':
-            processLikes(user_movie_ids)
-            break
-        elif int(user_movie_id) in movieNames['id']:
-            user_movie_ids.append(int(user_movie_id))
-        else:
-            print 'Please enter a valid movie ID.'
-            continue
+        user_movie_id = raw_input('Search for a movie you like, or enter a movie ID, or type "done" if finished: ')
+        #if int(user_movie_id) not in user_movie_ids:
+            if user_movie_id == 'done':
+                processLikes(user_movie_ids)
+                break
+            elif user_movie_id.isdigit() and int(user_movie_id) in movieNames['id']:
+                user_movie_ids.append(int(user_movie_id))
+            elif take_user_input(user_movie_id, False)==True:
+                take_user_input(user_movie_id, True)
+                user_selection = raw_input('Which of these movies do you like? (Enter Movie ID)')
+                user_movie_ids.append(int(user_selection))
+            else:
+                print 'Movie ID or name does not exist in our database. Please enter another movie.'
+                continue
+        #else:
+            #print 'You have already liked this movie. Please enter another movie.'
 
 
 def recommend_to_user():
@@ -240,5 +257,6 @@ def recommend_to_user():
             break
 
 recommend_to_user()
+
 
 
