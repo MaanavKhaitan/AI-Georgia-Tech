@@ -39,7 +39,7 @@ def findSimilar(iLike, userLikes):
 def printMovie(id):
     # Print the id of the movie and the name.  This should look something like
     # "    - 430: Duck Soup (1933)" if the id is 430 and the name is Duck Soup (1933)
-    print '- %s: %s' % (id, movieNames[id-1][1]) # replace 0 with the correct code
+    print '- ID %s: %s' % (id, movieNames[id-1][1]) # replace 0 with the correct code
 
 def processLikes(iLike):
     print("\n\nSince you like:")
@@ -182,11 +182,12 @@ for i in range(0,movieData.shape[0]):
     if movieData[i][2] >= 4:
         userLikes[movieData[i][0],movieData[i][1]] = 1
 
-""""
+
 ########################################################
 # At this point, go back up to the top and fill in the
 # functions up there
 ########################################################
+"""
 # First sample user
 # User Similiarity: 0.133333333333
 iLike = [655, 315, 66, 96, 194, 172]
@@ -228,18 +229,27 @@ def ask_user():
     while True: 
         user_movie_id = raw_input('Search for a movie you like, or enter a movie ID, or type "done" if finished: ')
         #if int(user_movie_id) not in user_movie_ids:
-            if user_movie_id == 'done':
-                processLikes(user_movie_ids)
-                break
-            elif user_movie_id.isdigit() and int(user_movie_id) in movieNames['id']:
-                user_movie_ids.append(int(user_movie_id))
-            elif take_user_input(user_movie_id, False)==True:
-                take_user_input(user_movie_id, True)
-                user_selection = raw_input('Which of these movies do you like? (Enter Movie ID)')
+        if user_movie_id == 'done':
+            processLikes(user_movie_ids)
+            break
+        elif user_movie_id.isdigit() and int(user_movie_id) in user_movie_ids:
+            print 'You have already liked this movie. Please enter another movie.'
+        elif user_movie_id.isdigit() and int(user_movie_id) in movieNames['id']:
+            user_movie_ids.append(int(user_movie_id))
+            print '\'%s\' added to liked movies.' % (movieNames[int(user_movie_id)-1][1])
+        elif take_user_input(user_movie_id, False)==True:
+            take_user_input(user_movie_id, True)
+            user_selection = raw_input('Which of these movies do you like? (Enter Movie ID or b to go back)')
+            if user_selection.isdigit() and int(user_selection) not in user_movie_ids:
                 user_movie_ids.append(int(user_selection))
-            else:
-                print 'Movie ID or name does not exist in our database. Please enter another movie.'
+                print '\'%s\' added to liked movies.' % (movieNames[int(user_selection)-1][1])
+            elif user_selection == 'b':
                 continue
+            else:
+                print 'You have already liked this movie. Please enter another movie.'
+        else:
+            print 'No movie matched your search. Please enter another movie.'
+            continue
         #else:
             #print 'You have already liked this movie. Please enter another movie.'
 
@@ -251,12 +261,10 @@ def recommend_to_user():
         user_again = raw_input('Would you like to add other movies you like? (y/n)')
         if user_again == 'y':
             ask_user()
-            processLikes(user_movie_ids)
         elif user_again == 'n':
             print 'Thank you for using our movie recommender today!'
             break
 
 recommend_to_user()
-
 
 
