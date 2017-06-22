@@ -240,13 +240,15 @@ def ask_user():
         elif take_user_input(user_movie_id, False)==True:
             take_user_input(user_movie_id, True)
             user_selection = raw_input('Which of these movies do you like? (Enter Movie ID or b to go back)')
-            if user_selection.isdigit() and int(user_selection) not in user_movie_ids:
+            if user_selection.isdigit() and int(user_selection) not in user_movie_ids and int(user_selection) in movieNames['id']:
                 user_movie_ids.append(int(user_selection))
                 print '\'%s\' added to liked movies.' % (movieNames[int(user_selection)-1][1])
             elif user_selection == 'b':
                 continue
-            else:
+            elif int(user_selection) in user_movie_ids:
                 print 'You have already liked this movie. Please enter another movie.'
+            else:
+                print 'No movie matched your search. Please enter another movie.'
         else:
             print 'No movie matched your search. Please enter another movie.'
             continue
