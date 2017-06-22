@@ -132,7 +132,7 @@ for key in entry.keys():
 # Get sorting ratings
 # https://www.saltycrane.com/blog/2007/09/how-to-sort-python-dictionary-by-keys/
 movieRatingS = sorted(movieRating.iteritems(), key=lambda (k,v): (v,k), reverse=True)
-
+"""
 # Top 10 Movies
 print("Top Ten Movies:")
 # Print the top 10 movies
@@ -153,7 +153,7 @@ hundred_movies = [movieRating.items()[i-1] for i in range(1,1683) if movieRating
 hundred_movieRatingS = sorted(hundred_movies, key=lambda (k,v): (v,k), reverse=True)
 for i in range(1,11):
     print '%s. %s (ID: %s) Rating: %s Count: %s' % (movieRatingS.index(hundred_movieRatingS[i-1])+1, movieNames[(hundred_movieRatingS[i-1][0])-1][1], hundred_movieRatingS[i-1][0], hundred_movieRatingS[i-1][1], movieRatingCount[hundred_movieRatingS[i-1][0]])
-
+"""
 
 #exit(0) # Remove this line after we finish phase 2
 
@@ -210,9 +210,11 @@ processLikes(iLike)
 # You can just assume they have a list of movies somewhere so they already know what numbers to type in.
 # If you'd like to give them options though, that would be a cool bonus project if you finish early.
 
-def recommend_to_user():
-    print 'Welcome to the Movie Recommender!'
-    user_movie_ids = []
+
+user_movie_ids = []
+
+
+def ask_user():
     while True: 
         user_movie_id = raw_input('Please enter an ID for a movie you like or type "done" if you\'re done: ')
         if user_movie_id == 'done':
@@ -223,6 +225,21 @@ def recommend_to_user():
         else:
             print 'Please enter a valid movie ID.'
             continue
+
+
+def recommend_to_user():
+    print 'Welcome to the Movie Recommender!'
+    ask_user()
+    while True:
+        user_again = raw_input('Would you like to add other movies you like? (y/n)')
+        if user_again == 'y':
+            ask_user()
+            processLikes(user_movie_ids)
+        elif user_again == 'n':
+            print 'Thank you for using our movie recommender today!'
+            break
+
 recommend_to_user()
 
 
+        
