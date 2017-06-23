@@ -13,7 +13,10 @@ def findSimilar(iLike, userLikes):
         userSimilarityOrLike = len([i for i, item in enumerate(userLikes[user]) if iLike[i]==1 or item==1])
         similarityAndDontLike = len([i for i, item in enumerate(userLikes[user]) if iLike[i]==2 and item==2])
         userSimilarityOrDontLike = len([i for i, item in enumerate(userLikes[user]) if iLike[i]==2 or item==2])
-        userSimilarity.append((similarityAndLike + 0.5*similarityAndDontLike)/float((userSimilarityOrLike + 0.5*userSimilarityOrDontLike)))
+        bothUsersDisagree = len([i for i, item in enumerate(userLikes[user]) if (iLike[i] == 2 and item==1) or (iLike[i] == 1 and item==2)])
+        addedLikes = iLike + userLikes[user]
+        addedLikes = len(np.argwhere(addedLikes!=0))
+        userSimilarity.append((similarityAndLike + 0.5*similarityAndDontLike - bothUsersDisagree)/float((addedLikes)))
         # replace 0 with the correct code to calculate the Jaccard Index for each user
     
     # Make sure the most similar user has a new like that the previous user did not have
@@ -61,7 +64,7 @@ def processLikes(iLike, iDontLike):
     # Convert iLike into an array of 0's and 1's which matches the array for other users
     # It should have one column for each movie (just like the userLikes array)
     # Start with all zeros, then fill in a 1 for each movie the user likes
-    iLikeNp = np.zeros((1, maxMovie+1)) # replace 0 with the code to make the array of zeros
+    iLikeNp = np.zeros((1, maxMovie)) # replace 0 with the code to make the array of zeros
     iLikeNp = iLikeNp.flatten()
     # You'll need a few more lines of code to fill in the 1's as needed
 
@@ -312,4 +315,3 @@ def recommend_to_user():
             break
 
 recommend_to_user()
-
