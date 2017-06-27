@@ -131,7 +131,7 @@ def processLikes(iLike, iDontLike):
 
     # For each item the similar user likes that the person didn't already say they liked
     # print the movie name using printMovie (you'll also need a for loop and an if statement)
-    
+
     for i in range(0,10):
         # If most similar movies by genre not already in most similar user's movies
         if genreSimilarities.index(max(genreSimilarities)) not in recLikes:
@@ -289,68 +289,106 @@ user_hate_movies = []
 
 
 def take_user_input(input_title, print_out):
+    # Check if user search is in any movie's name
     out = [i for i, v in enumerate(movieNames) if input_title.lower() in v[1].lower()]
+    # If search is in movie name
     if print_out == True:
+        # Print movies that contain user's search
         print 'Movies that match your search:'
         for item in out:
             printMovie(item+1)
+    # If at least one movie contains search, return True
     if len(out) > 0:
         return True
 
 
 def ask_user():
     while True: 
+        # ASk user for liked movies
         user_movie_id = raw_input('Search for a movie you like, or enter a movie ID, or type "done" if finished with liked movies: ')
         #if int(user_movie_id) not in user_movie_ids:
 
+        # If user is done with liked movies
         if user_movie_id == 'done':
+            # Ask if user wants to inform of disliked movies
             user_choice_hate = raw_input('Would you like to tell us about movies you don\'t like? (y/n)')
+
             if user_choice_hate == 'y':
                 while True:
+                    # Ask for disliked movies
                     user_movie_hate = raw_input('Please enter name of a movie or a movie ID you do not like (or type done if finished):')
+
+                    # If user provides new movie ID and movie ID exists, add movie to disliked movies
                     if user_movie_hate.isdigit() and int(user_movie_hate) in movieNames['id'] and int(user_movie_hate) not in user_hate_movies:
                         user_hate_movies.append(int(user_movie_hate))
                         print '\'%s\' added to disliked movies.' % (movieNames[int(user_movie_hate)-1][1])
+
+                    # If user already disliked this movie
                     elif user_movie_hate.isdigit() and int(user_movie_hate) in user_hate_movies:
                         print 'You have already disliked this movie. Please enter another movie.'
+
+                    # If user's search matches some movie, print related movies
                     elif take_user_input(user_movie_hate, False)==True:
                         take_user_input(user_movie_hate, True)
                         user_choice = raw_input('Which of these movies do you dislike? (Enter Movie ID or b to go back)')
+                        # If user provides new and existing movie ID, add movie to disliked movies
                         if user_choice.isdigit() and int(user_choice) not in user_hate_movies and int(user_choice) in movieNames['id']:
                             user_hate_movies.append(int(user_choice))
                             print '\'%s\' added to disliked movies.' % (movieNames[int(user_choice)-1][1])
+                        # If user wants to go back to main interface
                         elif user_choice == 'b':
                             continue
+                        # If user already disliked movie
                         elif user_choice.isdigit() and int(user_choice) in user_hate_movies:
                             print 'You have already disliked this movie. Please enter another movie.'
+                        # If movie does not exist in database  
                         else:
                             print 'No movie matched your search. Please enter another movie.'
+
+                    # If user is done with disliked movies recommend movies
                     elif user_movie_hate == 'done':
                         processLikes(user_movie_ids, user_hate_movies)
                         break
+
+                    #If movie does not exist in database
                     else:
                         print 'No movie matched your search. Please enter another movie.'
+
+            # If user doesn't want to enter disliked movies show recommended movies
             elif user_choice_hate == 'n':
                 processLikes(user_movie_ids,user_hate_movies)
                 break
             break
+
+        # If user already liked movie
         elif user_movie_id.isdigit() and int(user_movie_id) in user_movie_ids:
             print 'You have already liked this movie. Please enter another movie.'
+
+        # If user enters valid movie ID
         elif user_movie_id.isdigit() and int(user_movie_id) in movieNames['id']:
             user_movie_ids.append(int(user_movie_id))
             print '\'%s\' added to liked movies.' % (movieNames[int(user_movie_id)-1][1])
+
+        # If user's search matches some movie, print related movies
         elif take_user_input(user_movie_id, False)==True:
             take_user_input(user_movie_id, True)
             user_selection = raw_input('Which of these movies do you like? (Enter Movie ID or b to go back)')
+
+            # If user provides valid and new movie ID
             if user_selection.isdigit() and int(user_selection) not in user_movie_ids and int(user_selection) in movieNames['id']:
                 user_movie_ids.append(int(user_selection))
                 print '\'%s\' added to liked movies.' % (movieNames[int(user_selection)-1][1])
+            # If user wants to go back to main screen
             elif user_selection == 'b':
                 continue
+            # If user already liked movie
             elif user_selection.isdigit() and int(user_selection) in user_movie_ids:
                 print 'You have already liked this movie. Please enter another movie.'
+            # If movie does not exist
             else:
                 print 'No movie matched your search. Please enter another movie.'
+
+        # If movie does not exist
         else:
             print 'No movie matched your search. Please enter another movie.'
             continue
@@ -360,8 +398,10 @@ def ask_user():
 
 def recommend_to_user():
     print 'Welcome to the Movie Recommender!'
+    # Ask user for liked and disliked movies and provide recommmendations
     ask_user()
     while True:
+        # Check if user wants to input more liked and disliked movies
         user_again = raw_input('Would you like to add other movies you like or dislike? (y/n)')
         if user_again == 'y':
             ask_user()
