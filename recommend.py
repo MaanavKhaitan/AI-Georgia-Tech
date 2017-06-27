@@ -4,6 +4,8 @@ from scipy import spatial
 ########################################################
 # These functions will be used in Phase 3 (skip for now)
 ########################################################
+
+# Load in movieData and movieGenres
 movieData = np.loadtxt('/Users/maanavkhaitan/Downloads/baseCode/ml-100k/u.data', dtype={'names':('user','movie','rating'), 'formats': (np.int, np.int, np.int)}, usecols=(0,1,2)) # replace 0 with the correct cod eto load the movie data
 
 movieGenres = np.loadtxt('/Users/maanavkhaitan/Downloads/baseCode/ml-100k/u.item', delimiter='|', dtype={'names':('unknown','Action','Adventure','Animation','Children\'s','Comedy','Crime','Documentary','Drama','Fantasy','Film-Noir','Horror','Musical','Mystery','Romance','Sci-Fi','Thriller','War','Western'), 'formats':('f8','f8','f8','f8','f8','f8','f8','f8','f8','f8','f8','f8','f8','f8','f8','f8','f8','f8','f8',)},usecols=(5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23))
@@ -11,18 +13,27 @@ movieGenres = np.loadtxt('/Users/maanavkhaitan/Downloads/baseCode/ml-100k/u.item
 movieGenres = np.insert(movieGenres, 0, (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0))
 
 def findSimilar(iLike, userLikes):
-    # Calculate the similarity
+    # Calculate the similarity between movies user likes and all other user
     userSimilarity = []
     for user in range(0,len(userLikes)):
+        # Calculate Jaccard Similarity of user and every other user, taking into account likes and dislikes
 
+        # If both users like
         similarityAndLike = len([i for i, item in enumerate(userLikes[user]) if item==1 and iLike[i]==1])
+        # If one of the users likes
         userSimilarityOrLike = len([i for i, item in enumerate(userLikes[user]) if iLike[i]==1 or item==1])
+        # If both users don't like
         similarityAndDontLike = len([i for i, item in enumerate(userLikes[user]) if iLike[i]==2 and item==2])
+        # If one of the users doesn't like
         userSimilarityOrDontLike = len([i for i, item in enumerate(userLikes[user]) if iLike[i]==2 or item==2])
+        # If both users have conflicting views (like and dislike)
         bothUsersDisagree = len([i for i, item in enumerate(userLikes[user]) if (iLike[i] == 2 and item==1) or (iLike[i] == 1 and item==2)])
+
+        # Calculate Jaccard Similarity
         addedLikes = iLike + userLikes[user]
         addedLikes = len(np.argwhere(addedLikes!=0))
         userSimilarity.append((similarityAndLike + 0.5*similarityAndDontLike - bothUsersDisagree)/float((addedLikes)))
+
         # replace 0 with the correct code to calculate the Jaccard Index for each user
     
     # Make sure the most similar user has a new like that the previous user did not have
@@ -33,10 +44,13 @@ def findSimilar(iLike, userLikes):
 
 
     while True:
+        # Find user with highest similarity
         maxIndex = userSimilarity.index(max(userSimilarity))
+
+        # If both users are exactly the same:
         if np.all(np.argwhere(userLikes[maxIndex] == 1) == np.argwhere(iLike == 1)):
-        #if userLikes[maxIndex] == iLike:
             userSimilarity[maxIndex] = 0
+        # If user doesn't have any other liked movies
         elif set(np.argwhere(userLikes[maxIndex] == 1).flatten()) <= set(np.argwhere(iLike==1).flatten()):
             userSimilarity[maxIndex] = 0
         else:
@@ -59,11 +73,13 @@ def processLikes(iLike, iDontLike):
     # Print the name of each movie the user reported liking
     # Hint: Use a for loop and the printMovie function.
 
+    # Print movies liked
     for i in iLike:
         printMovie(i)
 
     print ("\n\nSince you don't like:")
 
+    # Print movies disliked
     for i in iDontLike:
         printMovie(i)
 
@@ -74,7 +90,7 @@ def processLikes(iLike, iDontLike):
     iLikeNp = iLikeNp.flatten()
     # You'll need a few more lines of code to fill in the 1's as needed
 
-    #iLike[:] = [x for x in iLike]
+    # in iLikeNp set all like indexes to 1 and all disliked indexes to 2
     iLikeNp[iLike] = 1
     iLikeNp[iDontLike] = 2
 
@@ -91,10 +107,15 @@ def processLikes(iLike, iDontLike):
 
     # Compare similarity of user's movies to every other movie
     genreSimilarities = []
+
+    # Loop over every movie's genres
     for i in range(0,len(movieGenres)):
+        # If movie has not already been liked by user
         if i not in iLike:
+            # Calculate cosine similarity between user's movies' genres and every other movie's genres
             result = 1 - spatial.distance.cosine(list(movieGenres[i]), list(genre_average))
             genreSimilarities.append(result)
+        # If user already liked movie set similarity to 0
         if i in iLike:
             genreSimilarities.append(0.0)
     genreSimilarities[0] = 0.0
@@ -103,18 +124,22 @@ def processLikes(iLike, iDontLike):
     user = findSimilar(iLikeNp, userLikes) # replace 0 with the correct code (hint: use one of your functions)
     print("\nYou might like: ")
 
-    # Find the indexes of the values that are ones
+    # Find the indexes of the values that are ones in most similar user
     # https://stackoverflow.com/a/17568803/3854385 (Note: You don't want it to be a list, but you do want to flatten it.)
     recLikes = np.argwhere(userLikes[user] == 1) # replace 0 with the needed code
     recLikes = recLikes.flatten()
 
     # For each item the similar user likes that the person didn't already say they liked
     # print the movie name using printMovie (you'll also need a for loop and an if statement)
-    for i in range(0,5):
+    
+    for i in range(0,10):
+        # If most similar movies by genre not already in most similar user's movies
         if genreSimilarities.index(max(genreSimilarities)) not in recLikes:
+            # Print most similar movie by genre
             printMovie(genreSimilarities.index(max(genreSimilarities)))
             genreSimilarities[genreSimilarities.index(max(genreSimilarities))] = 0.0
     for i in recLikes:
+        # If movie not already liked or disliked print recommended movie
         if i not in iLike and i not in iDontLike:
             printMovie(i)
         else:
