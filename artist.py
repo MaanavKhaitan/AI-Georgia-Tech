@@ -150,7 +150,7 @@ def print_generated():
 
 
 	# Set arbitrary weights for content, style, and total variation loss
-	content_weight = 0.425
+	content_weight = 0.035
 	style_weight = 5.0
 	total_variation_weight = 1.0
 
@@ -258,7 +258,7 @@ def print_generated():
 
 	output_image = Image.fromarray(x)
 	output_image.show()
-	output_image.save('resultartist1' '.bmp')
+	output_image.save('resultartist123' '.bmp')
 
 
 
