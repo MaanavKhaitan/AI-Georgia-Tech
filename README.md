@@ -1,1 +1,1 @@
-# AI-Georgia-Tech
+# Georgia-Tech-AI
