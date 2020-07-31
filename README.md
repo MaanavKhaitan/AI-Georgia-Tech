@@ -1,1 +1,1 @@
-# DukeTip
+# AI-Georgia-Tech
